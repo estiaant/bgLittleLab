@@ -89,6 +89,9 @@ button:focus-visible,select:focus-visible,[tabindex="0"]:focus-visible{outline:3
   .result .right{color:#416a56}.result .try-again,.paper-header{color:#795369}
 }
 
+/* A paper tab lifts once when a finished run adds new notes. */
+.wall-notes.notes-ready span{background:#fff1d3;color:#503a50;box-shadow:0 0 0 2px #795369}
+
 </style>
   <script>
 /*
@@ -559,7 +562,18 @@ window.LAB_DATA = [
   }
   function roomNote(room){return room==='desk'? 'Pick up the coffee or notepad. Click a science postcard to explore.':room==='physics'?'Try three hands-on physics investigations.':'Choose a chemistry experiment to learn by observing.'}
   function countBadges(){$('trialCount').textContent=String(journal.length)}
-  function navUpdate(){document.body.classList.toggle('experiment-open',scene==='experiment');$('fieldNotesButton').hidden=scene!=='experiment';for(const b of document.querySelectorAll('[data-room]')){const selected=scene==='experiment'?paths[active]:scene==='start'?'desk':scene;b.classList.toggle('active',b.dataset.room===selected);b.setAttribute('aria-current',b.dataset.room===selected?'page':'false')}badge.textContent=scene==='experiment'?`✦ ${EXP[active].station} · ${EXP[active].subject}`:SCENES[scene]?.label||SCENES.desk.label;
+  function markNewNotes(ready){
+    const button=$('fieldNotesButton'),tab=button.querySelector('span');
+    tab.getAnimations().forEach(animation=>animation.cancel());
+    button.classList.toggle('notes-ready',ready);
+    tab.textContent=ready?'NEW NOTES':'OPEN NOTES';
+    button.setAttribute('aria-label',ready?'Open new experiment field notes and graphs':'Open experiment field notes and graphs');
+    if(ready&&!reduced)tab.animate([
+      {transform:'translateY(0)'},{transform:'translateY(-8px)',offset:.3},
+      {transform:'translateY(-3px)',offset:.65},{transform:'translateY(0)'}
+    ],{duration:650,easing:'steps(4, end)'});
+  }
+  function navUpdate(){markNewNotes(false);document.body.classList.toggle('experiment-open',scene==='experiment');$('fieldNotesButton').hidden=scene!=='experiment';for(const b of document.querySelectorAll('[data-room]')){const selected=scene==='experiment'?paths[active]:scene==='start'?'desk':scene;b.classList.toggle('active',b.dataset.room===selected);b.setAttribute('aria-current',b.dataset.room===selected?'page':'false')}badge.textContent=scene==='experiment'?`✦ ${EXP[active].station} · ${EXP[active].subject}`:SCENES[scene]?.label||SCENES.desk.label;
     sceneHint.textContent=scene==='experiment'? '': SCENES[scene]?.hint || SCENES.desk.hint;
     sceneHint.style.display=scene==='experiment'?'none':'';
     $('sceneFooterLeft').textContent=scene==='experiment'?`✧ ${EXP[active].type}`:scene==='chemistry'?'✿ curiosity in every tiny bubble':scene==='physics'?'⚙ explore, predict, discover':'✦ a little world of big discoveries';}
@@ -596,8 +610,9 @@ window.LAB_DATA = [
     const tolerance=Math.max(.02,Math.abs(model.main)*.05),close=closeness!==null&&closeness<=tolerance;
     journal.push({id:active,title:e.title,when:new Date().toISOString(),settings:values,output:model.main,unit:e.outputUnit,prediction});
     journal=journal.slice(-200);safeSave('trials',journal);countBadges();run=null;result={values,model,prediction,close,closeness};
+    markNewNotes(true);
     $('runButton').disabled=false;panel.querySelectorAll('select').forEach(s=>s.disabled=false);
-    $('resultSlot').innerHTML='<p class="busy">Recorded! Open the wall Field Notes.</p>';playTap(785);live(`${e.title} complete. ${e.outputName}: ${format(model.main,3)} ${e.outputUnit}`)
+    $('resultSlot').innerHTML='<p class="busy">Recorded! Open the wall Field Notes.</p>';playTap(785);live(`${e.title} complete. ${e.outputName}: ${format(model.main,3)} ${e.outputUnit}. New field notes are ready.`)
   }
   function displayResult(observation=result){if(!observation)return;const e=EXP[active],{model,prediction,close}=observation;
     const feedback=prediction===null?'':`<p class="${close?'right':'try-again'}">${close?'♥ Your prediction was very close!':`✦ Your prediction: ${format(prediction,3)} ${e.outputUnit}. Compare it with the result.`}</p>`;
@@ -653,6 +668,7 @@ window.LAB_DATA = [
     return `<figure class="notes-graph"><div class="graph-scroll" tabindex="0" role="region" aria-label="Scrollable experiment graph"><svg viewBox="0 0 600 290" role="img" aria-label="${escapeHTML(g.yLabel)} versus ${escapeHTML(g.xLabel)}"><path d="M70 25V235H565" fill="none" stroke="#795369" stroke-width="3"/>${[0,.5,1].map(f=>`<text x="60" y="${239-f*200}" text-anchor="end">${format(maxY*f,3)}</text><text x="${70+f*490}" y="254" text-anchor="middle">${format(maxX*f,3)}</text>`).join('')}${points.map((p,i)=>`<circle cx="${70+p.x/maxX*490}" cy="${235-p.y/maxY*200}" r="6" fill="#a96785"><title>Run ${i+1}: ${p.x}, ${p.y}</title></circle>`).join('')}<text x="310" y="281" text-anchor="middle">${escapeHTML(g.xLabel)}</text><text transform="translate(17 140) rotate(-90)" text-anchor="middle">${escapeHTML(g.yLabel)}</text></svg></div><figcaption>Recorded runs only; other variables may differ. Compare the settings table before drawing conclusions.</figcaption></figure>`;
   }
   function openJournal(){
+    markNewNotes(false);
     const wrap=$('journalContent'),rows=active?journal.filter(r=>r.id===active):journal;
     $('journalTitle').textContent=active?EXP[active].title+' · Field notes':'My field notes ♡';
     $('notesResult').innerHTML='';

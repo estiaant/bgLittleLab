@@ -79,3 +79,6 @@ button:focus-visible,select:focus-visible,[tabindex="0"]:focus-visible{outline:3
   .pixel-btn.rose:hover:not(:disabled),.pixel-btn.start:hover:not(:disabled){background:#795369}
   .result .right{color:#416a56}.result .try-again,.paper-header{color:#795369}
 }
+
+/* A paper tab lifts once when a finished run adds new notes. */
+.wall-notes.notes-ready span{background:#fff1d3;color:#503a50;box-shadow:0 0 0 2px #795369}

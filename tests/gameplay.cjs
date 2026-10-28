@@ -16,12 +16,14 @@ const base=process.env.BASE_URL||'http://127.0.0.1:8000';
   const before=await page.locator('#world').screenshot();
   await page.locator('#predict').fill(expected.split(' ')[0]);
   const started=Date.now();await page.locator('#runButton').click();await page.waitForFunction(()=>!document.querySelector('#runButton').disabled);assert.ok(Date.now()-started<2500);
-  await page.locator('#fieldNotesButton').click();assert.equal(await page.locator('.answer').innerText(),expected);assert.match(await page.locator('.result').innerText(),/prediction was very close/);assert.equal(await page.locator('.journal-table tbody tr').count(),1);assert.equal(await page.locator('.notes-graph circle').count(),1);
+  assert.equal(await page.locator('#fieldNotesButton span').innerText(),'NEW NOTES');
+  await page.locator('#fieldNotesButton').click();assert.equal(await page.locator('#fieldNotesButton span').innerText(),'OPEN NOTES');assert.equal(await page.locator('.answer').innerText(),expected);assert.match(await page.locator('.result').innerText(),/prediction was very close/);assert.equal(await page.locator('.journal-table tbody tr').count(),1);assert.equal(await page.locator('.notes-graph circle').count(),1);
   await page.locator('[data-quiz="0"]').click();assert.ok(await page.locator('#quizFeedback').innerText());await page.keyboard.press('Escape');
   // Extreme settings still complete with scientific results and no failure effects.
   for(const sel of await page.locator('[data-variable]').all()){const count=await sel.locator('option').count();await sel.selectOption(id==='titration'&&await sel.getAttribute('data-variable')==='baseC'?'0':String(count-1));}
   await page.locator('#runButton').click();await page.waitForFunction(()=>!document.querySelector('#runButton').disabled);
   const after=await page.locator('#world').screenshot();assert.ok(!before.equals(after));
+  assert.equal(await page.locator('#fieldNotesButton span').innerText(),'NEW NOTES');
   await page.locator('#fieldNotesButton').click();assert.equal(await page.locator('.journal-table tbody tr').count(),2);assert.equal(await page.locator('.notes-graph circle').count(),2);
   const extreme={momentum:2,gravity:Math.sqrt(8/9.8),stairs:85*9.8*1.5,rates:20/Math.pow(1.45,1.5),titration:50};
   assert.ok(Math.abs(parseFloat(await page.locator('.answer').innerText())-extreme[id])<.00051);
