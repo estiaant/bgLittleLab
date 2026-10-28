@@ -180,25 +180,25 @@
     rect(572,231,38,31,'#664c5d');rect(578,227,26,31,'#e0ad89');rect(589,202,5,33,'#6f9a76');rect(581,211,7,18,'#95b68d');rect(594,208,8,20,'#8eb78b');
     rect(0,275,W,6,'#e5c69b');
   }
-  function animationPlan(id,v){
-    const model=calculate(id,v);let duration=1200,mishap='';
-    if(id==='momentum'){duration=1900-v.speed*280;if(v.redMass*v.speed/(+v.redMass + +v.blueMass)>=2)mishap='Track overshoot! The joined trolleys tumble onto the padded mat.'}
-    if(id==='gravity'){duration=500+model.main*1050;if(v.mass*v.height>=2)mishap='Thump! The heavy landing pops the cushion seams.'}
-    if(id==='stairs'){duration=450+v.height/v.pace*140;if(v.pace>=1.5&&v.height>=3)mishap='Too much sprint! Our scientist takes a wobbly seated finish.'}
-    if(id==='rates'){duration=450+model.main*19;if(v.temp>=35&&v.concentration>=.3)mishap='Cloud burst! A fictional frothy spill escapes the dish.'}
-    if(id==='titration'){duration=550+model.main*23;if(model.main>=40)mishap='Full flask! A fictional overflow splashes the tray.'}
-    return {duration:clamp(duration,650,1700),mishap};
+  function animationDuration(id,v){
+    const model=calculate(id,v);
+    const duration={
+      momentum:1900-v.speed*280,
+      gravity:500+model.main*1050,
+      stairs:450+v.height/v.pace*140,
+      rates:450+model.main*19,
+      titration:550+model.main*23
+    };
+    return clamp(duration[id],650,1700);
   }
 
   function drawMomentum(t,p,v){labBackdrop('physics',t);label('THE CRASH TRACK',335,43,'#fff0cf',14,'center');
     rect(59,297,430,15,'#5b6370');rect(61,292,423,7,'#d1c9b5');rect(59,309,432,8,'#4d5663');for(let x=80;x<489;x+=40)rect(x,310,19,5,'#aab7a9');
     const m1=+v.redMass,m2=+v.blueMass, speed=+v.speed;let redX=150,blueX=374;const finalSpeed=(m1*speed)/(m1+m2), travel=Math.min(62,16+22*finalSpeed);
     if((run||result) && p<.68){redX=150+(p/.68)*132;}else if(run||result){redX=282+((p-.68)/.32)*travel;blueX=374+((p-.68)/.32)*travel;}
-    const tumble=animationPlan('momentum',v).mishap&&p>.8?(p-.8)*5:0;
-    if(tumble){redX=302+tumble*15;blueX=394+tumble*15;rect(258,344,192,13,'#a4b8a0');rect(263,341,182,7,'#c9d5b2')}
-    c.save();c.translate(0,tumble*48);if(tumble){c.translate(blueX,271);c.rotate(reduced?0:tumble*.5);c.translate(-blueX,-271)}trackTrolley(redX,271,'red',1.18);trackTrolley(blueX,271,'blue',1.18);
+    trackTrolley(redX,271,'red',1.18);trackTrolley(blueX,271,'blue',1.18);
     for(let i=0;i<Math.round(m1*2);i++)rect(redX-23+i*12,224,10,12,'#e1c298');
-    for(let i=0;i<Math.round(m2*2);i++)rect(blueX-23+i*12,224,10,12,'#e1c298');c.restore();
+    for(let i=0;i<Math.round(m2*2);i++)rect(blueX-23+i*12,224,10,12,'#e1c298');
     if(run && p>.65&&p<.77){sparkle(332,245,t,'#fff3b6');sparkle(347,263,t,'#edbd94')}
     for(let i=0;i<6;i++){rect(74+i*64,330,3,11,'#d5c3af');label(String(i),74+i*64,352,'#f4e4c9',9)}
     label('RED '+format(m1,1)+' kg',redX,207,'#fad0ca',11,'center');label('BLUE '+format(m2,1)+' kg',blueX,207,'#e1f3df',11,'center');
@@ -212,9 +212,7 @@
     for(let i=0;i<=4;i++)label(`${i}m`,169,305-i*55,'#f1e3c9',10);
     rect(249,top-11,118,6,'#6a7577');rect(252,top-16,109,6,'#c7cfb4');
     const fall=(run||result) ? (p>=.10? Math.pow(clamp((p-.10)/.85,0,1),2):0):0;
-    const impact=animationPlan('gravity',v).mishap&&p>.9;
-    if(impact){for(let i=0;i<6;i++)rect(254+i*20,310+(i%2)*9,12,5,'#e4b8a1')}
-    const ballY=top+(296-top)*fall-(impact&&!reduced?Math.sin((p-.9)*Math.PI*10)*12:0);oval(303,ballY,10+mass*6,10+mass*6,'#644960',2);oval(301,ballY-2,7+mass*6,7+mass*6,'#c98699',2);rect(295,ballY-8,7,4,'#ffe1cb');
+    const ballY=top+(296-top)*fall;oval(303,ballY,10+mass*6,10+mass*6,'#644960',2);oval(301,ballY-2,7+mass*6,7+mass*6,'#c98699',2);rect(295,ballY-8,7,4,'#ffe1cb');
     rect(253,307,115,15,'#597176');rect(250,302,123,10,'#f5d7ad');
     if(run && fall>.09&&fall<.95){for(let i=0;i<4;i++)rect(296+(i%2)*10,ballY-16-i*12,3,6,'#f7d7bb')}
     label('drop from rest',307,345,'#ffedc9',12,'center');}
@@ -222,9 +220,7 @@
     const height=+v.height,pace=+v.pace,rise=90+height*22;
     for(let i=0;i<11;i++){const x=55+i*34,y=295-i*rise/10;rect(x,y,45,80+i*18,'#665d65');rect(x,y-7,45,12,'#e9c59e');rect(x,y+5,45,8,'#b19891');}
     const prog=(run||result)?p:0;const x=99+prog*333,y=260-prog*rise;
-    if(prog>.85&&animationPlan('stairs',v).mishap){c.save();c.translate(x,y);c.rotate(reduced?0:(prog-.85)*3);c.translate(-x,-y)}
     drawKid(x,y,.95+v.mass/300,run?p*(4+pace*4):0);
-    if(prog>.85&&animationPlan('stairs',v).mishap)c.restore();
     if(run){for(let i=0;i<4;i++)rect(x-27-i*12,y+14+i*5,5,3,'#e6c5aa')}
     label('START',70,335,'#ffe3ca',11);label('FINISH ♡',411,270-rise,'#fff1d1',12);
   }
@@ -233,7 +229,6 @@
     // X lies under the container, rather than magically changing its colour.
     for(let i=0;i<71;i+=4){rect(245+i,172+i,10,7,'#514354');rect(315-i,172+i,10,7,'#514354')}
     const opacity=(run||result)?clamp((p-.06)/.78,0,.98):.05;
-    if(p>.65&&animationPlan('rates',v).mishap){for(let i=0;i<8;i++){const x=210+i*19;oval(x,235+(i%3)*7,10,5,'#e2cf94',3);if(!reduced)rect(x,170-Math.sin(p*12+i)*25,4,7,'#efe1b9')}}
     glass(279,196,78,'#bfd9d1',opacity);
     // The black X is seen THROUGH the clear solution and progressively vanishes.
     c.save();c.globalAlpha=Math.max(0,1-opacity*1.12);for(let i=-27;i<=27;i+=3){rect(279+i-4,207+i*.65,9,7,'#59465a');rect(279+i-4,207-i*.65,9,7,'#59465a')}c.restore();
@@ -248,7 +243,6 @@
     rect(183,109,173,8,'#686473');rect(182,104,174,6,'#dac4a9');rect(343,95,15,27,'#d9b18b');
     rect(294,69,25,165,'#644e62');rect(298,67,17,164,'#e0f1d7');rect(301,77,11,123,'#b7caca');
     const poured=(run||result)?calculate('titration',v).main*p:0;rect(301,77,11,Math.max(0,123-poured*2),'#94b9bc');
-    if(p>.85&&animationPlan('titration',v).mishap){oval(306,333,67,9,'#c9a2bd',3);for(let i=0;i<4;i++)rect(260+i*28,318,5,11,'#e4bfd4')}
     const indicator=(run||result)&&p>.80?'#d6b0ce':'#f1d6b6';
     rect(297,70,20,9,'#c2a49d');rect(295,232,22,7,'#806270');rect(302,239,8,15,'#e9d0a8');
     for(let i=0;i<10;i++)rect(297,92+i*11,5,i%2?1:2,'#8a8584');
@@ -262,7 +256,6 @@
   function visualProgress(t){if(!run)return 0;return clamp((t-run.started)/run.duration,0,1)}
   function experimentScene(t){const v=run?.values||result?.values||selectedValues();const p=run?visualProgress(t):result?1:0;
     if(active==='momentum')drawMomentum(t,p,v);else if(active==='gravity')drawGravity(t,p,v);else if(active==='stairs')drawStairs(t,p,v);else if(active==='rates')drawRates(t,p,v);else if(active==='titration')drawTitration(t,p,v);
-    if((run||result)&&p>.86&&animationPlan(active,v).mishap){label('OOPS! CHECK FIELD NOTES',240,336,'#fff0cf',11,'center')}
     rect(34,357,300,10,'#684f5e');rect(37,359,294,6,'#e3c1a4');if(run){rect(37,359,294*p,6,'#b57d94');}else{rect(37,359,294*(result?1:.03),6,'#b57d94')}
     if(run){label('SIMULATION RUNNING…',334,380,'#ffedc8',11,'center')}else if(result){label('EXPERIMENT COMPLETE ♡',332,380,'#ffedc8',11,'center')}else{label('CHANGE THE VARIABLES, THEN RUN',328,380,'#ffebd4',11,'center')}
   }
@@ -329,8 +322,7 @@
   function enterExperiment(id){if(!EXP[id])return;scene='experiment';active=id;held=null;run=null;result=null;quizChoice=null;titleOverlay.hidden=true;navUpdate();experimentPanel();playTap(587);live(`Opened ${EXP[id].title}`)}
   function startRun(){if(!active||run)return;const values=selectedValues();const predField=$('predict');const prediction=predField?.value.trim()===''?null:Number(predField.value);
     const model=calculate(active,values);result=null;quizChoice=null;
-    const plan=animationPlan(active,values);
-    run={started:performance.now(),duration:reduced?350:plan.duration,values,model,prediction,mishap:plan.mishap};
+    run={started:performance.now(),duration:reduced?350:animationDuration(active,values),values,model,prediction};
     $('resultSlot').innerHTML='<p class="busy">✧ The little experiment is running…</p>';
     $('runButton').disabled=true;panel.querySelectorAll('select').forEach(s=>s.disabled=true);
     playTap(698);live(`Running ${EXP[active].title}`);
@@ -338,7 +330,7 @@
   function finishRun(){if(!run||scene!=='experiment')return;const e=EXP[active],{values,model,prediction}=run;
     const closeness=prediction!==null && Number.isFinite(prediction)?Math.abs(prediction-model.main):null;
     const tolerance=Math.max(.02,Math.abs(model.main)*.05),close=closeness!==null&&closeness<=tolerance;
-    journal.push({id:active,title:e.title,when:new Date().toISOString(),settings:values,output:model.main,unit:e.outputUnit,prediction,mishap:run.mishap});
+    journal.push({id:active,title:e.title,when:new Date().toISOString(),settings:values,output:model.main,unit:e.outputUnit,prediction});
     journal=journal.slice(-200);safeSave('trials',journal);countBadges();run=null;result={values,model,prediction,close,closeness};
     $('runButton').disabled=false;panel.querySelectorAll('select').forEach(s=>s.disabled=false);
     $('resultSlot').innerHTML='<p class="busy">Recorded! Open the wall Field Notes.</p>';playTap(785);live(`${e.title} complete. ${e.outputName}: ${format(model.main,3)} ${e.outputUnit}`)
@@ -394,7 +386,7 @@
     const points=rows.map(row=>{const v=row.settings,m=calculate(id,v).main;return {x:g.x==='tSquared'?m*m:g.x==='time'?v.height/v.pace:+v[g.x],y:g.y==='height'?+v.height:g.y==='rate'?1/m:m}}).filter(p=>Number.isFinite(p.x)&&Number.isFinite(p.y));
     if(!points.length)return '';
     const maxX=Math.max(...points.map(p=>p.x),.01)*1.15,maxY=Math.max(...points.map(p=>p.y),.01)*1.15;
-    return `<figure class="notes-graph"><svg viewBox="0 0 600 290" role="img" aria-label="${escapeHTML(g.yLabel)} versus ${escapeHTML(g.xLabel)}"><path d="M70 25V235H565" fill="none" stroke="#795369" stroke-width="3"/>${[0,.5,1].map(f=>`<text x="60" y="${239-f*200}" text-anchor="end">${format(maxY*f,3)}</text><text x="${70+f*490}" y="254" text-anchor="middle">${format(maxX*f,3)}</text>`).join('')}${points.map((p,i)=>`<circle cx="${70+p.x/maxX*490}" cy="${235-p.y/maxY*200}" r="6" fill="#a96785"><title>Run ${i+1}: ${p.x}, ${p.y}</title></circle>`).join('')}<text x="310" y="281" text-anchor="middle">${escapeHTML(g.xLabel)}</text><text transform="translate(17 140) rotate(-90)" text-anchor="middle">${escapeHTML(g.yLabel)}</text></svg><figcaption>Recorded runs only; other variables may differ. Compare the settings table before drawing conclusions.</figcaption></figure>`;
+    return `<figure class="notes-graph"><div class="graph-scroll" tabindex="0" role="region" aria-label="Scrollable experiment graph"><svg viewBox="0 0 600 290" role="img" aria-label="${escapeHTML(g.yLabel)} versus ${escapeHTML(g.xLabel)}"><path d="M70 25V235H565" fill="none" stroke="#795369" stroke-width="3"/>${[0,.5,1].map(f=>`<text x="60" y="${239-f*200}" text-anchor="end">${format(maxY*f,3)}</text><text x="${70+f*490}" y="254" text-anchor="middle">${format(maxX*f,3)}</text>`).join('')}${points.map((p,i)=>`<circle cx="${70+p.x/maxX*490}" cy="${235-p.y/maxY*200}" r="6" fill="#a96785"><title>Run ${i+1}: ${p.x}, ${p.y}</title></circle>`).join('')}<text x="310" y="281" text-anchor="middle">${escapeHTML(g.xLabel)}</text><text transform="translate(17 140) rotate(-90)" text-anchor="middle">${escapeHTML(g.yLabel)}</text></svg></div><figcaption>Recorded runs only; other variables may differ. Compare the settings table before drawing conclusions.</figcaption></figure>`;
   }
   function openJournal(){
     const wrap=$('journalContent'),rows=active?journal.filter(r=>r.id===active):journal;
@@ -403,16 +395,16 @@
     if(!rows.length)wrap.innerHTML='<div class="empty-journal">Run an experiment, then return to this wall for your notes and graphs.</div>';
     else{
       const ids=active?[active]:[...new Set(rows.map(r=>r.id))];
-      wrap.innerHTML=ids.filter(id=>EXP[id]).map(id=>{const e=EXP[id],trials=rows.filter(r=>r.id===id);return `<section class="experiment-notes"><h3>${escapeHTML(e.title)}</h3><p>${escapeHTML(e.mission)}</p><p>${escapeHTML(e.controlNote)}</p><div class="journal-table-wrap"><table class="journal-table"><thead><tr><th>Run</th>${e.variables.map(v=>`<th>${escapeHTML(v.name)} (${escapeHTML(v.unit)})</th>`).join('')}<th>${escapeHTML(e.outputName)} (${escapeHTML(e.outputUnit)})</th><th>Observation</th></tr></thead><tbody>${trials.map((row,i)=>`<tr><td>${i+1}</td>${e.variables.map(v=>`<td>${escapeHTML(row.settings[v.key+'Label']?row.settings[v.key+'Label']+' · '+row.settings[v.key]:row.settings[v.key])}</td>`).join('')}<td>${format(+row.output,3)}</td><td>${escapeHTML(row.mishap||'Completed normally')}</td></tr>`).join('')}</tbody></table></div>${graphFor(id,trials)}<p>${escapeHTML(e.scienceNote)}</p><p>${escapeHTML(calculate(id,trials.at(-1).settings).formula)}</p></section>`}).join('')+'<p class="model-disclaimer">Mishaps are fictional game effects after the ideal model outcome. They are not predictions of real equipment failure. Numbers and graphs use the stated ideal scientific models; playback time is compressed.</p>';
+      wrap.innerHTML=ids.filter(id=>EXP[id]).map(id=>{const e=EXP[id],trials=rows.filter(r=>r.id===id);return `<section class="experiment-notes"><h3>${escapeHTML(e.title)}</h3><p>${escapeHTML(e.mission)}</p><p>${escapeHTML(e.controlNote)}</p><p class="graph-hint">Scroll sideways to see every variable and the full graph.</p><div class="journal-table-wrap" tabindex="0" role="region" aria-label="Recorded experiment runs"><table class="journal-table"><thead><tr><th>Run</th>${e.variables.map(v=>`<th>${escapeHTML(v.name)} (${escapeHTML(v.unit)})</th>`).join('')}<th>${escapeHTML(e.outputName)} (${escapeHTML(e.outputUnit)})</th></tr></thead><tbody>${trials.map((row,i)=>`<tr><td>${i+1}</td>${e.variables.map(v=>`<td>${escapeHTML(row.settings[v.key+'Label']?row.settings[v.key+'Label']+' · '+row.settings[v.key]:row.settings[v.key])}</td>`).join('')}<td>${format(+row.output,3)}</td></tr>`).join('')}</tbody></table></div>${graphFor(id,trials)}<p>${escapeHTML(e.scienceNote)}</p><p>${escapeHTML(calculate(id,trials.at(-1).settings).formula)}</p></section>`}).join('')+'<p class="model-disclaimer">Numbers and graphs use the stated ideal scientific models. Animation playback is compressed; it does not represent real elapsed time.</p>';
     }
     if(active&&rows.length){const last=rows.at(-1),model=calculate(active,last.settings),prediction=last.prediction??null;displayResult({model,prediction,close:prediction!==null&&Math.abs(prediction-model.main)<=Math.max(.02,Math.abs(model.main)*.05)})}
-    $('journalModal').hidden=false;document.querySelector('main').inert=true;$('journalModal').querySelector('[data-close]').focus();playTap(523);
+    $('journalModal').hidden=false;$('journalModal').querySelector('.journal-paper').scrollTop=0;document.querySelector('main').inert=true;$('journalModal').querySelector('[data-close]').focus();playTap(523);
   }
   function closeJournal(){$('journalModal').hidden=true;document.querySelector('main').inert=false;(active?$('fieldNotesButton'):$('journalButton')).focus()}
   $('fieldNotesButton').addEventListener('click',openJournal);
   $('printNotes').addEventListener('click',()=>window.print());
   $('journalModal').addEventListener('keydown',event=>{
-    if(event.key!=='Tab')return;const controls=[...$('journalModal').querySelectorAll('button,input,select,textarea,a[href]')].filter(el=>!el.disabled);const first=controls[0],last=controls.at(-1);
+    if(event.key!=='Tab')return;const controls=[...$('journalModal').querySelectorAll('button,input,select,textarea,a[href],[tabindex="0"]')].filter(el=>!el.disabled);const first=controls[0],last=controls.at(-1);
     if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}
   });
   $('journalButton').addEventListener('click',openJournal);

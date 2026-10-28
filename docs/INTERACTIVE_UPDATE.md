@@ -1,5 +1,8 @@
 # Interactive experiment update — 28 October 2026
 
+Historical implementation notes. The mishaps described below were subsequently
+removed at the user’s request; see MOBILE_REVIEW.md for the current behaviour.
+
 The approved pixel art, colours, typography, music and native stack are retained.
 The simulation fills the main frame. Variable controls occupy a clipboard prop
 at its side; on narrow screens the clipboard stacks beneath the scene to keep

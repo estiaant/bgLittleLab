@@ -64,10 +64,15 @@ CSV export and clearing are scoped to the active experiment; the desk journal
 still shows all experiments. Existing saved runs remain readable.
 
 Animation time is compressed to 0.65–1.7 seconds and responds to the selected
-variables. High incoming trolley momentum, heavy/high ball drops, tall sprints,
-hot concentrated mixtures and high titration volumes trigger deterministic,
-fictional mishaps. The ideal scientific result is kept separate from those effects.
-Reduced-motion mode shortens playback and suppresses added rotations and bounces.
+variables. Every valid setting completes normally; failure animations have been
+removed. Reduced-motion mode shortens playback. Saved scientific measurements
+are retained, and old failure annotations are no longer displayed.
+
+The mobile clipboard uses readable 16px inputs and 44–48px touch targets. The
+scene stays in view while scrolling controls in portrait, while short landscape
+screens place the clipboard alongside the scene. Notes use a pinned close button,
+readable horizontally scrollable graphs and tables, and a native print dialog.
+See `docs/MOBILE_REVIEW.md` for the Impeccable review and verification limits.
 
 With the local server running, `node tests/gameplay.cjs` runs the browser smoke
 check. It needs Playwright and Chromium (available in this cloud environment);
