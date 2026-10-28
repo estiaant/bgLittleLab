@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#31283e">
+  <meta name="description" content="Little Lab: a cosy, offline, pixel-art science experiment game.">
+  <title>Little Lab · a tiny science adventure</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="js/resource-data.js"></script>
+  <script defer src="js/game.js"></script>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand" aria-label="Little Lab"><span class="brand-star">✦</span> LITTLE<span>LAB</span><span class="brand-heart">♥</span></div>
+      <nav class="nav" aria-label="Rooms">
+        <button type="button" class="nav-button" data-room="desk">⌂ <span>DESK</span></button>
+        <button type="button" class="nav-button" data-room="physics">⚙ <span>PHYSICS</span></button>
+        <button type="button" class="nav-button" data-room="chemistry">✿ <span>CHEMISTRY</span></button>
+      </nav>
+      <button id="musicToggle" type="button" class="sound-button" aria-label="Toggle music" aria-pressed="true">♫ <span>MUSIC ON</span></button>
+    </header>
+
+    <div class="layout">
+      <section class="game-frame" aria-label="Pixel-art game scene">
+        <div class="canvas-bound">
+          <canvas id="world" width="640" height="400" tabindex="0" aria-label="Interactive pixel art. Select a station or pick up items on the desk."></canvas>
+          <div id="titleOverlay" class="title-overlay">
+            <div class="title-plate">
+              <span class="tiny-stars" aria-hidden="true">✧ · ✦ · ✧</span>
+              <h1>LITTLE LAB<span>♥</span></h1>
+              <p>a tiny science adventure</p>
+              <button id="startButton" class="pixel-btn start" type="button">✦ START EXPLORING ✦</button>
+              <span class="title-small">made for curious minds</span>
+            </div>
+          </div>
+          <div class="canvas-badge" id="canvasBadge">✦ YOUR COSY DESK</div>
+          <div class="scene-hint" id="sceneHint">Pick something up · or visit a laboratory ♡</div>
+        </div>
+        <div class="scene-footer"><span id="sceneFooterLeft">✦ a little world of big discoveries</span><span id="sceneFooterRight">OFFLINE &amp; HANDMADE ♡</span></div>
+      </section>
+
+      <aside class="sidebar" aria-label="Experiment controls and lab information">
+        <div class="side-top"><span class="side-top-dot"></span><span id="panelEyebrow">WELCOME, SCIENTIST</span><span class="side-top-sparkle">✧</span></div>
+        <div id="panelContent" class="panel-content"></div>
+        <div class="side-bottom"><span>✦ LITTLE LAB / FIELD NOTES</span><button id="journalButton" class="text-button" type="button">✎ JOURNAL <span id="trialCount">0</span></button></div>
+      </aside>
+    </div>
+    <footer class="outer-footer">A small, gentle place to experiment. No login, no internet, no real chemicals. <span>♡</span></footer>
+    <p class="sr-only" id="liveStatus" aria-live="polite" role="status"></p>
+  </main>
+
+  <div class="modal-shade" id="noteModal" hidden>
+    <section class="modal-paper" role="dialog" aria-modal="true" aria-labelledby="noteTitle">
+      <div class="paper-header"><span>✦ PERSONAL NOTES</span><button class="close-cross" type="button" data-close="note" aria-label="Close">×</button></div>
+      <h2 id="noteTitle">A little note ♡</h2>
+      <textarea id="noteInput" rows="6" maxlength="160" placeholder="What did you discover today?"></textarea>
+      <div class="modal-actions"><span id="noteCount">0 / 160</span><div><button type="button" class="pixel-btn pale" data-close="note">CANCEL</button><button id="noteSave" type="button" class="pixel-btn rose">OKAY ♥</button></div></div>
+    </section>
+  </div>
+  <div class="modal-shade" id="journalModal" hidden>
+    <section class="journal-paper" role="dialog" aria-modal="true" aria-labelledby="journalTitle">
+      <div class="paper-header"><span>✦ SCIENTIST'S NOTEBOOK</span><button class="close-cross" type="button" data-close="journal" aria-label="Close">×</button></div>
+      <h2 id="journalTitle">My field notes ♡</h2>
+      <p class="journal-explain">Every finished experiment is saved here on this device. Compare runs, then export your findings.</p>
+      <div id="journalContent"></div>
+      <div class="journal-footer"><button id="exportButton" type="button" class="pixel-btn pale">↓ EXPORT CSV</button><button id="clearJournal" type="button" class="pixel-btn pale">CLEAR RUNS</button><button type="button" class="pixel-btn rose" data-close="journal">DONE ♥</button></div>
+    </section>
+  </div>
+</body>
+</html>
