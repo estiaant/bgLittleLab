@@ -25,7 +25,10 @@
     <div class="layout">
       <section class="game-frame" aria-label="Pixel-art game scene">
         <div class="canvas-bound">
+          <div class="scene-surface">
           <canvas id="world" width="640" height="400" tabindex="0" aria-label="Interactive pixel art. Select a station or pick up items on the desk."></canvas>
+
+          <button id="fieldNotesButton" class="wall-notes" type="button" hidden aria-label="Open experiment field notes and graphs">FIELD NOTES<span>OPEN NOTES &amp; GRAPHS</span></button>
           <div id="titleOverlay" class="title-overlay">
             <div class="title-plate">
               <span class="tiny-stars" aria-hidden="true">✧ · ✦ · ✧</span>
@@ -37,15 +40,17 @@
           </div>
           <div class="canvas-badge" id="canvasBadge">✦ YOUR COSY DESK</div>
           <div class="scene-hint" id="sceneHint">Pick something up · or visit a laboratory ♡</div>
-        </div>
-        <div class="scene-footer"><span id="sceneFooterLeft">✦ a little world of big discoveries</span><span id="sceneFooterRight">OFFLINE &amp; HANDMADE ♡</span></div>
-      </section>
-
-      <aside class="sidebar" aria-label="Experiment controls and lab information">
+          </div>
+      <aside class="sidebar clipboard" aria-label="Experiment controls and lab information">
         <div class="side-top"><span class="side-top-dot"></span><span id="panelEyebrow">WELCOME, SCIENTIST</span><span class="side-top-sparkle">✧</span></div>
         <div id="panelContent" class="panel-content"></div>
         <div class="side-bottom"><span>✦ LITTLE LAB / FIELD NOTES</span><button id="journalButton" class="text-button" type="button">✎ JOURNAL <span id="trialCount">0</span></button></div>
       </aside>
+        </div>
+        <div class="scene-footer"><span id="sceneFooterLeft">✦ a little world of big discoveries</span><span id="sceneFooterRight">OFFLINE &amp; HANDMADE ♡</span></div>
+      </section>
+
+
     </div>
     <footer class="outer-footer">A small, gentle place to experiment. No login, no internet, no real chemicals. <span>♡</span></footer>
     <p class="sr-only" id="liveStatus" aria-live="polite" role="status"></p>
@@ -63,9 +68,10 @@
     <section class="journal-paper" role="dialog" aria-modal="true" aria-labelledby="journalTitle">
       <div class="paper-header"><span>✦ SCIENTIST'S NOTEBOOK</span><button class="close-cross" type="button" data-close="journal" aria-label="Close">×</button></div>
       <h2 id="journalTitle">My field notes ♡</h2>
-      <p class="journal-explain">Every finished experiment is saved here on this device. Compare runs, then export your findings.</p>
+      <p class="journal-explain">Recorded runs from this experiment. Compare your variables, observations and graphs.</p>
       <div id="journalContent"></div>
-      <div class="journal-footer"><button id="exportButton" type="button" class="pixel-btn pale">↓ EXPORT CSV</button><button id="clearJournal" type="button" class="pixel-btn pale">CLEAR RUNS</button><button type="button" class="pixel-btn rose" data-close="journal">DONE ♥</button></div>
+      <div id="notesResult"></div>
+      <div class="journal-footer"><button id="printNotes" type="button" class="pixel-btn rose">PRINT FIELD NOTES</button><button id="exportButton" type="button" class="pixel-btn pale">↓ EXPORT CSV</button><button id="clearJournal" type="button" class="pixel-btn pale">CLEAR RUNS</button><button type="button" class="pixel-btn rose" data-close="journal">DONE ♥</button></div>
     </section>
   </div>
 </body>

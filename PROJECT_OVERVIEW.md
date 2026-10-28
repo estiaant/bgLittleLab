@@ -52,3 +52,39 @@ archive and its source content. The standalone page was regenerated successfully
 No gameplay or visual refactor was needed for environment preparation. Keep the
 small native stack until a concrete feature or measured problem warrants more.
 Next: playtest this baseline, then make focused changes based on that feedback.
+
+## Interactive experiment update
+
+Experiment controls are a clipboard prop alongside the enlarged scene (stacked
+below the scene on narrow screens). The painted Field Notes board is a keyboard
+accessible button. It opens recorded runs for the current experiment, a scatter
+plot using the experiment's declared axes, scientific notes and a printable
+cream-and-plum report. Printing uses the browser's native dialog and works offline.
+CSV export and clearing are scoped to the active experiment; the desk journal
+still shows all experiments. Existing saved runs remain readable.
+
+Animation time is compressed to 0.65–1.7 seconds and responds to the selected
+variables. High incoming trolley momentum, heavy/high ball drops, tall sprints,
+hot concentrated mixtures and high titration volumes trigger deterministic,
+fictional mishaps. The ideal scientific result is kept separate from those effects.
+Reduced-motion mode shortens playback and suppresses added rotations and bounces.
+
+With the local server running, `node tests/gameplay.cjs` runs the browser smoke
+check. It needs Playwright and Chromium (available in this cloud environment);
+it adds no runtime dependency to the game. `BASE_URL` and `CHROMIUM_PATH` can
+select another server or Chromium installation. Screenshots, a print PDF and CSV
+are saved to a temporary directory reported by the check.
+
+## Cloudflare deployment
+
+The existing `littlelab` Worker deploys from GitHub `main` with
+`npx wrangler deploy`. `wrangler.jsonc` configures static assets only; no Worker
+script, backend, bindings or secrets are needed. `.assetsignore` publishes only
+`index.html`, `play-offline.html`, `style.css` and `js/`, excluding the ZIP,
+Git metadata, tests and documentation. Rebuild `play-offline.html` before pushing.
+
+Deployment configuration was validated with Wrangler 4.154.0 in dry-run mode and
+a local Worker. Local requests confirmed that game assets return 200 while the
+archive, Git configuration, docs, tests and Wrangler configuration return 404.
+A GitHub push triggers the connected build; confirming that the public deployment
+finished is a separate check.

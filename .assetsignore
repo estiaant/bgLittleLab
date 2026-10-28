@@ -1,0 +1,7 @@
+# Publish only the browser game, never repository metadata or the starter archive.
+*
+!index.html
+!play-offline.html
+!style.css
+!js/
+!js/**
