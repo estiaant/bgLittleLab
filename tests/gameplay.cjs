@@ -14,8 +14,9 @@ const base=process.env.BASE_URL||'http://127.0.0.1:8000';
   await page.locator(`[data-room="${room}"]`).click();await page.locator(`[data-experiment="${id}"]`).click();
   await page.locator('#fieldNotesButton').click();assert.match(await page.locator('#journalContent').innerText(),/Run an experiment/);await page.keyboard.press('Escape');
   const before=await page.locator('#world').screenshot();
+  await page.locator('#predict').fill(expected.split(' ')[0]);
   const started=Date.now();await page.locator('#runButton').click();await page.waitForFunction(()=>!document.querySelector('#runButton').disabled);assert.ok(Date.now()-started<2500);
-  await page.locator('#fieldNotesButton').click();assert.equal(await page.locator('.answer').innerText(),expected);assert.equal(await page.locator('.journal-table tbody tr').count(),1);assert.equal(await page.locator('.notes-graph circle').count(),1);
+  await page.locator('#fieldNotesButton').click();assert.equal(await page.locator('.answer').innerText(),expected);assert.match(await page.locator('.result').innerText(),/prediction was very close/);assert.equal(await page.locator('.journal-table tbody tr').count(),1);assert.equal(await page.locator('.notes-graph circle').count(),1);
   await page.locator('[data-quiz="0"]').click();assert.ok(await page.locator('#quizFeedback').innerText());await page.keyboard.press('Escape');
   // Every extreme control setting produces a distinct, recorded fictional mishap.
   for(const sel of await page.locator('[data-variable]').all()){const count=await sel.locator('option').count();await sel.selectOption(id==='titration'&&await sel.getAttribute('data-variable')==='baseC'?'0':String(count-1));}
